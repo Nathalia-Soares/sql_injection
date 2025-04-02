@@ -1,6 +1,7 @@
 package produtos_vulneravel
 
 import (
+	"github.com/joho/godotenv"
 	"database/sql"
 	"encoding/json"
 	"log"
@@ -12,14 +13,26 @@ import (
 var db *sql.DB
 
 func init() {
+
 	var err error
-	db, err = sql.Open("postgres", "host=localhost port=5432 user=your_user password=your_password dbname=your_database sslmode=disable")
-	if err != nil {
-		log.Fatal(err)
-	}
+
+    host := os.Getenv("DB_HOST")
+    port := os.Getenv("DB_PORT")
+    user := os.Getenv("DB_USER")
+    password := os.Getenv("DB_PASSWORD")
+    dbname := os.Getenv("DB_NAME")
+	sslmode := os.Getenv("DB_SSLMODE")
+
+    dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+        host, port, user, password, dbname, sslmode)
+
+    db, err = sql.Open("postgres", dsn)
+    if err != nil {
+        log.Fatal(err)
+    }
 }
 
-func getProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
+func GetProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
 	categoria := r.URL.Query().Get("categoria")
 	query := "SELECT * FROM products WHERE categoria = '" + categoria + "'"
 	rows, err := db.Query(query)
@@ -33,7 +46,7 @@ func getProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
 	for rows.Next() {
 		var id int
 		var nome, categoria string
-		if err := rows.Scan(&id, &name, &category); err != nil {
+		if err := rows.Scan(&id, &nome, &categoria); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
