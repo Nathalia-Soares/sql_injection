@@ -1,11 +1,12 @@
-package produtos_vulneravel
+package produtos_protegido
 
 import (
-	"github.com/joho/godotenv"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
 )
@@ -16,26 +17,26 @@ func init() {
 
 	var err error
 
-    host := os.Getenv("DB_HOST")
-    port := os.Getenv("DB_PORT")
-    user := os.Getenv("DB_USER")
-    password := os.Getenv("DB_PASSWORD")
-    dbname := os.Getenv("DB_NAME")
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
 	sslmode := os.Getenv("DB_SSLMODE")
 
-    dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-        host, port, user, password, dbname, sslmode)
+	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode)
 
-    db, err = sql.Open("postgres", dsn)
-    if err != nil {
-        log.Fatal(err)
-    }
+	db, err = sql.Open("postgres", dsn)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
-func GetProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
+func GetProdutosProtegido(w http.ResponseWriter, r *http.Request) {
 	categoria := r.URL.Query().Get("categoria")
-	query := "SELECT * FROM products WHERE categoria = '" + categoria + "'"
-	rows, err := db.Query(query)
+	query := "SELECT * FROM products WHERE categoria = $1"
+	rows, err := db.Query(query, categoria)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
