@@ -14,7 +14,7 @@ import (
 var db *sql.DB
 
 func init() {
-  
+
 	var err error
 
 	host := os.Getenv("DB_HOST")
@@ -46,12 +46,12 @@ func GetProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
 	var produtos []map[string]interface{}
 	for rows.Next() {
 		var id int
-		var nome, img, categoria string
-		if err := rows.Scan(&id, &nome, &img, &categoria); err != nil {
+		var nome, categoria, img_url string
+		if err := rows.Scan(&id, &nome, &categoria, &img_url); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		produtos = append(produtos, map[string]interface{}{"id": id, "nome": nome, "img": img, "categoria": categoria})
+		produtos = append(produtos, map[string]interface{}{"id": id, "nome": nome, "categoria": categoria, "img_url": img_url})
 	}
 
 	json.NewEncoder(w).Encode(produtos)
