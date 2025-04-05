@@ -8,14 +8,17 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
 func init() {
-
-	var err error
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Erro ao carregar o arquivo .env")
+	}
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -23,6 +26,8 @@ func init() {
 	password := os.Getenv("DB_PASSWORD")
 	dbname := os.Getenv("DB_NAME")
 	sslmode := os.Getenv("DB_SSLMODE")
+
+	log.Printf("Conectando ao banco em %s:%s como %s no banco %s", host, port, user, dbname)
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		host, port, user, password, dbname, sslmode)
@@ -35,7 +40,7 @@ func init() {
 
 func GetProdutosProtegido(w http.ResponseWriter, r *http.Request) {
 	categoria := r.URL.Query().Get("categoria")
-	query := "SELECT * FROM products WHERE categoria = $1"
+	query := "SELECT * FROM produtos WHERE categoria = $1"
 	rows, err := db.Query(query, categoria)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -46,12 +51,12 @@ func GetProdutosProtegido(w http.ResponseWriter, r *http.Request) {
 	var produtos []map[string]interface{}
 	for rows.Next() {
 		var id int
-		var nome, categoria string
-		if err := rows.Scan(&id, &nome, &categoria); err != nil {
+		var nome, img, categoria string
+		if err := rows.Scan(&id, &nome, &img, &categoria); err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		produtos = append(produtos, map[string]interface{}{"id": id, "nome": nome, "categoria": categoria})
+		produtos = append(produtos, map[string]interface{}{"id": id, "nome": nome, "img": img, "categoria": categoria})
 	}
 
 	json.NewEncoder(w).Encode(produtos)

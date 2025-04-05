@@ -8,14 +8,17 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
 func init() {
-
-	var err error
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Erro ao carregar o arquivo .env")
+	}
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
@@ -35,7 +38,7 @@ func init() {
 
 func GetProdutosVulneravel(w http.ResponseWriter, r *http.Request) {
 	categoria := r.URL.Query().Get("categoria")
-	query := "SELECT * FROM products WHERE categoria = '" + categoria + "'"
+	query := "SELECT * FROM produtos WHERE categoria = '" + categoria + "'"
 	rows, err := db.Query(query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

@@ -10,5 +10,5 @@ import (
 func main() {
 	controller.SetupController()
 	log.Println("Servidor rodando na porta 8080")
-	http.ListenAndServe(":8081", nil)
+	http.ListenAndServe(":8080", nil)
 }
