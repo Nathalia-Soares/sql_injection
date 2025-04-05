@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: sql_injection-backend
+    env: go
+    buildCommand: go build -o app .
+    startCommand: ./app
+    envVars:
+      - key: GOTOOLCHAIN
+        value: local
+      - key: GO_VERSION
+        value: 1.24.2
