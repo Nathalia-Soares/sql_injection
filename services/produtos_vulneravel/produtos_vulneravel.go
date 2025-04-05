@@ -8,17 +8,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
 
 var db *sql.DB
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Erro ao carregar o arquivo .env")
-	}
+	var err error
 
 	host := os.Getenv("DB_HOST")
 	port := os.Getenv("DB_PORT")
