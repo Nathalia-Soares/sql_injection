@@ -14,6 +14,7 @@ import (
 var db *sql.DB
 
 func init() {
+  
 	var err error
 
 	host := os.Getenv("DB_HOST")
